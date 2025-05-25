@@ -1,10 +1,17 @@
 import express from "express";
 import cors from "cors";
+import rateLimit from 'express-rate-limit';
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 mins
+  max: 100, // limit each IP to 100 requests per window
+});
 
 const app = express();
 
 const allowedOrigins = [
     "https://grab-vocab.vercel.app",   // replace with your frontend domain
+    "http://localhost:5173",          // replace with your frontend domain
   ];
   
   const corsOptions: cors.CorsOptions = {
@@ -20,5 +27,6 @@ const allowedOrigins = [
 
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use(limiter); // Apply rate limiting to all requests
 
 export default app;

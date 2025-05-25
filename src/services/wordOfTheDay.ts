@@ -6,7 +6,7 @@ export async function getRandomWordFromOpenAI(): Promise<string> {
   const prompt =
     "Give me a single rare English word (no meaning), one word only.";
   const response = await openai.chat.completions.create({
-    model: "gpt-3.5-turbo",
+    model: "gpt-4.1-nano",
     messages: [{ role: "user", content: prompt }],
   });
   console.log("Response from OpenAI:", response);
