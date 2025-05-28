@@ -11,6 +11,8 @@ const WordSchema = new mongoose.Schema({
   antonyms: [String],
   memoryTrick: String,
   origin: String,
+  positivePrompt: String,
+  negativePrompt: String,
 });
 
 export default mongoose.models.Word || mongoose.model("Word", WordSchema);
