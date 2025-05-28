@@ -1,9 +1,9 @@
 {
-    "client_id": "9d8a7d807f4240c1a9dae388bd12b1e5",
+    "client_id": "a7677213cb1240efb9fbb6456e4b9bb8",
     "prompt": {
         "3": {
             "inputs": {
-                "seed": 305960394325128,
+                "seed": 657731197468652,
                 "steps": 40,
                 "cfg": 8,
                 "sampler_name": "dpmpp_sde",
@@ -53,7 +53,7 @@
         },
         "6": {
             "inputs": {
-                "text": "portrait of a young woman, ultra realistic, DSLR, 85mm lens, natural lighting, shallow depth of field, freckles, high detail skin\n",
+                "text": "A vivid scene of the sun partially obscured by the moon, casting a gentle, diffuse shadow over a landscape with soft light and a peaceful atmosphere, highlighting the subtle transition between light and darkness.",
                 "clip": [
                     "4",
                     1
@@ -66,7 +66,7 @@
         },
         "7": {
             "inputs": {
-                "text": "text, watermark, blurry, low res, bad anatomy, worst quality, jpeg artifacts, extra limbs, bad hands, deformed face, cartoon, drawing",
+                "text": "blurry, low quality, text, deformed, dark or overly shadowed, cluttered background",
                 "clip": [
                     "4",
                     1
@@ -233,82 +233,6 @@
                         ]
                     },
                     {
-                        "id": 6,
-                        "type": "CLIPTextEncode",
-                        "pos": [
-                            415,
-                            186
-                        ],
-                        "size": [
-                            422.84503173828125,
-                            164.31304931640625
-                        ],
-                        "flags": {},
-                        "order": 2,
-                        "mode": 0,
-                        "inputs": [
-                            {
-                                "name": "clip",
-                                "type": "CLIP",
-                                "link": 3
-                            }
-                        ],
-                        "outputs": [
-                            {
-                                "name": "CONDITIONING",
-                                "type": "CONDITIONING",
-                                "slot_index": 0,
-                                "links": [
-                                    4
-                                ]
-                            }
-                        ],
-                        "properties": {
-                            "Node name for S&R": "CLIPTextEncode"
-                        },
-                        "widgets_values": [
-                            "portrait of a young woman, ultra realistic, DSLR, 85mm lens, natural lighting, shallow depth of field, freckles, high detail skin\n"
-                        ]
-                    },
-                    {
-                        "id": 7,
-                        "type": "CLIPTextEncode",
-                        "pos": [
-                            413,
-                            389
-                        ],
-                        "size": [
-                            425.27801513671875,
-                            180.6060791015625
-                        ],
-                        "flags": {},
-                        "order": 3,
-                        "mode": 0,
-                        "inputs": [
-                            {
-                                "name": "clip",
-                                "type": "CLIP",
-                                "link": 5
-                            }
-                        ],
-                        "outputs": [
-                            {
-                                "name": "CONDITIONING",
-                                "type": "CONDITIONING",
-                                "slot_index": 0,
-                                "links": [
-                                    6
-                                ]
-                            }
-                        ],
-                        "properties": {
-                            "Node name for S&R": "CLIPTextEncode"
-                        },
-                        "widgets_values": [
-                            "text, watermark, blurry, low res, bad anatomy, worst quality, jpeg artifacts, extra limbs, bad hands, deformed face, cartoon, drawing"
-                        ]
-                    },
-                    {
                         "id": 5,
                         "type": "EmptyLatentImage",
                         "pos": [
@@ -392,13 +316,89 @@
                             "Node name for S&R": "KSampler"
                         },
                         "widgets_values": [
-                            305960394325128,
+                            657731197468652,
                             "randomize",
                             40,
                             8,
                             "dpmpp_sde",
                             "karras",
                             1
+                        ]
+                    },
+                    {
+                        "id": 6,
+                        "type": "CLIPTextEncode",
+                        "pos": [
+                            415,
+                            186
+                        ],
+                        "size": [
+                            422.84503173828125,
+                            164.31304931640625
+                        ],
+                        "flags": {},
+                        "order": 2,
+                        "mode": 0,
+                        "inputs": [
+                            {
+                                "name": "clip",
+                                "type": "CLIP",
+                                "link": 3
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "name": "CONDITIONING",
+                                "type": "CONDITIONING",
+                                "slot_index": 0,
+                                "links": [
+                                    4
+                                ]
+                            }
+                        ],
+                        "properties": {
+                            "Node name for S&R": "CLIPTextEncode"
+                        },
+                        "widgets_values": [
+                            "A vivid scene of the sun partially obscured by the moon, casting a gentle, diffuse shadow over a landscape with soft light and a peaceful atmosphere, highlighting the subtle transition between light and darkness."
+                        ]
+                    },
+                    {
+                        "id": 7,
+                        "type": "CLIPTextEncode",
+                        "pos": [
+                            413,
+                            389
+                        ],
+                        "size": [
+                            425.27801513671875,
+                            180.6060791015625
+                        ],
+                        "flags": {},
+                        "order": 3,
+                        "mode": 0,
+                        "inputs": [
+                            {
+                                "name": "clip",
+                                "type": "CLIP",
+                                "link": 5
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "name": "CONDITIONING",
+                                "type": "CONDITIONING",
+                                "slot_index": 0,
+                                "links": [
+                                    6
+                                ]
+                            }
+                        ],
+                        "properties": {
+                            "Node name for S&R": "CLIPTextEncode"
+                        },
+                        "widgets_values": [
+                            "blurry, low quality, text, deformed, dark or overly shadowed, cluttered background"
                         ]
                     }
                 ],
@@ -480,10 +480,10 @@
                 "config": {},
                 "extra": {
                     "ds": {
-                        "scale": 0.7513148009015777,
+                        "scale": 0.6830134553650705,
                         "offset": [
-                            -64.2518271630463,
-                            363.72152713104725
+                            -8.218806850546201,
+                            356.22217400604734
                         ]
                     },
                     "frontendVersion": "1.20.5"

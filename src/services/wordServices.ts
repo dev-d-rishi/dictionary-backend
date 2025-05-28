@@ -20,6 +20,7 @@ interface WordDetails {
   origin: string;
   positivePrompt: string;
   negativePrompt: string;
+  promptId?: string; // Optional, for image generation service
 }
 
 export async function getWordDetails(word: string): Promise<WordDetails> {

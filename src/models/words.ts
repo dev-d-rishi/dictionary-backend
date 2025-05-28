@@ -13,6 +13,8 @@ const WordSchema = new mongoose.Schema({
   origin: String,
   positivePrompt: String,
   negativePrompt: String,
+  imageURL: String,
+  promptId: String, // ID from the image generation service
 });
 
 export default mongoose.models.Word || mongoose.model("Word", WordSchema);
