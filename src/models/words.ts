@@ -11,6 +11,10 @@ const WordSchema = new mongoose.Schema({
   antonyms: [String],
   memoryTrick: String,
   origin: String,
+  positivePrompt: String,
+  negativePrompt: String,
+  imageURL: String,
+  promptId: String, // ID from the image generation service
 });
 
 export default mongoose.models.Word || mongoose.model("Word", WordSchema);

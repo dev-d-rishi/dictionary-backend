@@ -28,18 +28,65 @@ app.get("/hello", (req, res) => {
 app.get("/define/:word", async (req, res) => {
   try {
     const term = req.params.word.toLowerCase();
-    const wordData = await getWordDetails(term);
+    console.log("🔍 Searching for word:", term);
 
     const existing = await words.findOne({ word: term });
+    console.log("📦 Found existing entry:", existing ? "Yes" : "No");
+
     if (existing) {
-      res.json({ word: term, result: existing });
+      if (existing.imageURL) {
+        console.log("🖼️ Image already exists, skipping prompt.");
+        res.json({
+          term: term,
+          result: existing,
+          promptId: existing.promptId || null,
+        });
+        return;
+      }
+
+      if (existing.promptId) {
+        console.log("⚡ Prompt ID already exists, skipping prompt generation.");
+        res.json({
+          term: term,
+          result: existing,
+          promptId: existing.promptId,
+        });
+        return;
+      }
+
+      // const promptId = await sendPromptAPI(
+      //   existing.positivePrompt,
+      //   existing.negativePrompt
+      // );
+      // console.log("🚀 Prompt sent for existing word. ID:", promptId);
+
+      // await words.updateOne({ word: term }, { $set: { promptId } });
+
+      // res.json({ term: term, result: existing, promptId });
+      res.json({ term: term, result: existing });
       return;
     }
-    await words.create(wordData);
-    res.json({ term, result: wordData });
-    return;
+
+    console.log("🆕 Word not found, generating new entry...");
+    const wordData = await getWordDetails(term);
+    console.log("📘 Generated word data:", wordData);
+
+    // const promptId = await sendPromptAPI(
+    //   wordData.positivePrompt,
+    //   wordData.negativePrompt
+    // );
+    // console.log("🚀 Prompt sent for new word. ID:", promptId);
+
+    // Add promptId before saving
+    // wordData.promptId = promptId;
+
+    const savedWord = await words.create(wordData);
+    console.log("✅ New word saved to database with prompt ID.");
+
+    // res.json({ term, result: savedWord, promptId });
+    res.json({ term, result: savedWord });
   } catch (err) {
-    console.error("Error fetching word details:", err);
+    console.error("❌ Error fetching word details:", err);
     res.status(500).json({ error: "Something went wrong" });
   }
 });

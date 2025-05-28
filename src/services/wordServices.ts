@@ -18,6 +18,9 @@ interface WordDetails {
   antonyms: string[];
   memoryTrick: string;
   origin: string;
+  positivePrompt: string;
+  negativePrompt: string;
+  promptId?: string; // Optional, for image generation service
 }
 
 export async function getWordDetails(word: string): Promise<WordDetails> {
@@ -35,7 +38,9 @@ export async function getWordDetails(word: string): Promise<WordDetails> {
             "synonyms": string[],          // List of 3 to 5 synonyms
             "antonyms": string[],          // List of antonyms (if available)
             "memoryTrick": string,         // A memory trick or way to remember the word
-            "origin": string               // Short origin story or etymology
+            "origin": string,              // Short origin story or etymology
+            "positivePrompt": string,      // Describe a highly visual, imaginative, vivid scene that represents the meaning or theme of the word (for use with image generators like Stable Diffusion).
+            "negativePrompt": string       // List undesirable elements to avoid in that generated image (e.g., "blurry", "low quality", "text", "deformed").
         }
 
         Make sure the JSON is correctly formatted with double quotes, no extra text outside the JSON object, and all keys are present (use empty strings or empty arrays if some info is missing).
@@ -66,6 +71,8 @@ export async function getWordDetails(word: string): Promise<WordDetails> {
       antonyms: [],
       memoryTrick: "",
       origin: "",
+      positivePrompt: "",
+      negativePrompt: "",
     };
   }
 }
