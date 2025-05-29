@@ -12,10 +12,8 @@ import {
   sendPromptAPI,
   uploadImageToS3,
 } from "./services/generateImageWithComfyUI";
+import allWordsRoutes from "./routes/allWords";
 import AWS from "aws-sdk";
-import fs from "fs";
-import path from "path";
-import axios from "axios";
 
 dotenv.config();
 
@@ -220,6 +218,8 @@ app.get("/wordoftheday", async (req, res) => {
     res.status(500).json({ error: "Could not fetch word of the day" });
   }
 });
+
+app.use("/admin/allWords", allWordsRoutes);
 
 connectDB().then(() => {
   app.listen(PORT, () => {
