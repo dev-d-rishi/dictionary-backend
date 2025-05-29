@@ -6,6 +6,7 @@ import connectDB from "./database";
 import words from "./models/words";
 import wordOfTheDay from "./models/wordOfTheDay";
 import { getRandomWordFromOpenAI } from "./services/wordOfTheDay";
+import allWordsRoutes from "./routes/allWords";
 
 // Load environment variables
 dotenv.config();
@@ -119,6 +120,8 @@ app.get("/wordoftheday", async (req, res) => {
     res.status(500).json({ error: "Could not fetch word of the day" });
   }
 });
+
+app.use("/admin/allWords", allWordsRoutes);
 
 connectDB().then(() => {
   app.listen(PORT, () => {
