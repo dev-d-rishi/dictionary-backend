@@ -95,7 +95,7 @@ const waitForImageFilename = async (
 
 export const getImagesByWords = async (req: Request, res: Response) => {
   try {
-    const { wordList } = req.body;
+    const { words: wordList } = req.body;
 
     if (!Array.isArray(wordList) || wordList.length === 0) {
       return res

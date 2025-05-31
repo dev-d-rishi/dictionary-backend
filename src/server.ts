@@ -13,6 +13,7 @@ import {
   uploadImageToS3,
 } from "./services/generateImageWithComfyUI";
 import allWordsRoutes from "./routes/allWords";
+import uploadExcelRouter from "./routes/uploadExcel";
 import AWS from "aws-sdk";
 
 dotenv.config();
@@ -220,6 +221,8 @@ app.get("/wordoftheday", async (req, res) => {
 });
 
 app.use("/admin/allWords", allWordsRoutes);
+
+app.use("/api", uploadExcelRouter);
 
 connectDB().then(() => {
   app.listen(PORT, () => {
