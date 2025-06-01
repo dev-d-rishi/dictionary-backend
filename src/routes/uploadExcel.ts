@@ -5,8 +5,6 @@ import multer from "multer";
 import xlsx from "xlsx";
 
 const router = express.Router();
-
-// Configure multer for file uploads
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
@@ -19,17 +17,39 @@ router.post("/upload-excel", upload.single("file"), async (req, res) => {
       return;
     }
 
-    // Parse buffer using xlsx
-    const workbook = xlsx.read(file.buffer, { type: "buffer" });
-    const sheetName = workbook.SheetNames[0];
-    const data = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName], {
-      header: 1,
-    });
+    let uniqueWords: string[] = [];
 
-    const flatWords = data.flat().filter(Boolean);
-    const uniqueWords = Array.from(
-      new Set(flatWords.map((w) => String(w).trim().toLowerCase()))
-    );
+    // Handle Excel files
+    if (
+      file.mimetype ===
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+      file.mimetype === "application/vnd.ms-excel"
+    ) {
+      const workbook = xlsx.read(file.buffer, { type: "buffer" });
+      const sheetName = workbook.SheetNames[0];
+      const data = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName], {
+        header: 1,
+      });
+      const flatWords = data.flat().filter(Boolean);
+      uniqueWords = Array.from(
+        new Set(flatWords.map((w) => String(w).trim().toLowerCase()))
+      );
+    }
+
+    // Handle .txt files
+    else if (file.mimetype === "text/plain") {
+      const text = file.buffer.toString("utf-8");
+      const words = text
+        .split(/\r?\n/) // split by lines
+        .flatMap((line) => line.split(",")) // further split by comma
+        .map((w) => w.trim())
+        .filter(Boolean);
+
+      uniqueWords = Array.from(new Set(words.map((w) => w.toLowerCase())));
+    } else {
+      res.status(400).json({ error: "Unsupported file type" });
+      return;
+    }
 
     if (uniqueWords.length === 0) {
       res.status(400).json({ error: "No valid words found in file" });
@@ -43,8 +63,8 @@ router.post("/upload-excel", upload.single("file"), async (req, res) => {
 
     res.json({ words: response.data });
   } catch (error: any) {
-    console.error("Excel Upload Error:", error.response.data);
-    res.status(500).json({ error: "Failed to read Excel file" });
+    console.error("File Upload Error:", error?.response?.data || error.message);
+    res.status(500).json({ error: error?.response?.data || error.message || "Failed to process file" });
   }
 });
 
