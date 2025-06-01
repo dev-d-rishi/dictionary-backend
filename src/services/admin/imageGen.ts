@@ -155,6 +155,7 @@ export const getImagesByWords = async (req: Request, res: Response) => {
     }
 
     res.json({ results });
+    return;
   } catch (err) {
     console.error("❌ Error in getImagesByWords:", err);
     res.status(500).json({ error: "Server error while processing words" });
