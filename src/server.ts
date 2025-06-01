@@ -6,6 +6,7 @@ import connectDB from "./database";
 import words from "./models/words";
 import wordOfTheDay from "./models/wordOfTheDay";
 import { getRandomWordFromOpenAI } from "./services/wordOfTheDay";
+import authRoutes from "./routes/auth";
 import allWordsRoutes from "./routes/allWords";
 
 // Load environment variables
@@ -120,6 +121,8 @@ app.get("/wordoftheday", async (req, res) => {
     res.status(500).json({ error: "Could not fetch word of the day" });
   }
 });
+
+app.use('/auth', authRoutes);
 
 app.use("/admin/allWords", allWordsRoutes);
 
