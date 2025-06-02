@@ -76,7 +76,7 @@ export const defineManyWords = async (req: Request, res: Response) => {
 
 const waitForImageFilename = async (
   promptId: string,
-  retries = 150,
+  retries = 1,
   delay = 4000
 ): Promise<string | null> => {
   for (let i = 0; i < retries; i++) {
@@ -147,7 +147,7 @@ export const getImagesByWords = async (req: Request, res: Response) => {
           { new: true }
         );
 
-        results.push({ word, imageURL: s3URL, status: "success", updated });
+        results.push({ word:{word:word.word, imageURL: word.imageURL}, imageURL: s3URL, status: "success", updated });
       } catch (err: any) {
         console.error(`❌ Error for word "${word}":`, err);
         results.push({ word, status: "error", message: err.message });

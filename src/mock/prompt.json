@@ -1,13 +1,13 @@
 {
-    "client_id": "a7677213cb1240efb9fbb6456e4b9bb8",
+    "client_id": "8556a93c407949479f55b83038bc7ef4",
     "prompt": {
         "3": {
             "inputs": {
-                "seed": 657731197468652,
+                "seed": 456216854534545,
                 "steps": 40,
                 "cfg": 8,
                 "sampler_name": "dpmpp_sde",
-                "scheduler": "karras",
+                "scheduler": "normal",
                 "denoise": 1,
                 "model": [
                     "4",
@@ -33,7 +33,7 @@
         },
         "4": {
             "inputs": {
-                "ckpt_name": "v1-5-pruned-emaonly.safetensors"
+                "ckpt_name": "model.safetensors"
             },
             "class_type": "CheckpointLoaderSimple",
             "_meta": {
@@ -53,7 +53,7 @@
         },
         "6": {
             "inputs": {
-                "text": "A vivid scene of the sun partially obscured by the moon, casting a gentle, diffuse shadow over a landscape with soft light and a peaceful atmosphere, highlighting the subtle transition between light and darkness.",
+                "text": "A vivid scene of a solitary figure standing amidst a bustling crowd, glowing softly with a serene and unassuming presence, vibrant colors highlighting their peaceful anonymity\n        ",
                 "clip": [
                     "4",
                     1
@@ -66,7 +66,7 @@
         },
         "7": {
             "inputs": {
-                "text": "blurry, low quality, text, deformed, dark or overly shadowed, cluttered background",
+                "text": "blurry, low quality, text, deformed, crowded, dark, ominous, chaotic",
                 "clip": [
                     "4",
                     1
@@ -110,7 +110,7 @@
     "extra_data": {
         "extra_pnginfo": {
             "workflow": {
-                "id": "6129a7f6-59ad-4538-bb2d-6df05968503d",
+                "id": "6a53003a-f17a-42c4-8ff1-ff83a7838b26",
                 "revision": 0,
                 "last_node_id": 9,
                 "last_link_id": 9,
@@ -155,6 +155,33 @@
                             "Node name for S&R": "VAEDecode"
                         },
                         "widgets_values": []
+                    },
+                    {
+                        "id": 9,
+                        "type": "SaveImage",
+                        "pos": [
+                            1451,
+                            189
+                        ],
+                        "size": [
+                            210,
+                            58
+                        ],
+                        "flags": {},
+                        "order": 6,
+                        "mode": 0,
+                        "inputs": [
+                            {
+                                "name": "images",
+                                "type": "IMAGE",
+                                "link": 9
+                            }
+                        ],
+                        "outputs": [],
+                        "properties": {},
+                        "widgets_values": [
+                            "ComfyUI"
+                        ]
                     },
                     {
                         "id": 4,
@@ -202,34 +229,7 @@
                             "Node name for S&R": "CheckpointLoaderSimple"
                         },
                         "widgets_values": [
-                            "v1-5-pruned-emaonly.safetensors"
-                        ]
-                    },
-                    {
-                        "id": 9,
-                        "type": "SaveImage",
-                        "pos": [
-                            1451,
-                            189
-                        ],
-                        "size": [
-                            210,
-                            270
-                        ],
-                        "flags": {},
-                        "order": 6,
-                        "mode": 0,
-                        "inputs": [
-                            {
-                                "name": "images",
-                                "type": "IMAGE",
-                                "link": 9
-                            }
-                        ],
-                        "outputs": [],
-                        "properties": {},
-                        "widgets_values": [
-                            "ComfyUI"
+                            "model.safetensors"
                         ]
                     },
                     {
@@ -270,8 +270,8 @@
                         "id": 3,
                         "type": "KSampler",
                         "pos": [
-                            864.8059692382812,
-                            190.0856170654297
+                            863,
+                            186
                         ],
                         "size": [
                             315,
@@ -316,12 +316,12 @@
                             "Node name for S&R": "KSampler"
                         },
                         "widgets_values": [
-                            657731197468652,
+                            456216854534545,
                             "randomize",
                             40,
                             8,
                             "dpmpp_sde",
-                            "karras",
+                            "normal",
                             1
                         ]
                     },
@@ -360,7 +360,7 @@
                             "Node name for S&R": "CLIPTextEncode"
                         },
                         "widgets_values": [
-                            "A vivid scene of the sun partially obscured by the moon, casting a gentle, diffuse shadow over a landscape with soft light and a peaceful atmosphere, highlighting the subtle transition between light and darkness."
+                            "A vivid scene of a solitary figure standing amidst a bustling crowd, glowing softly with a serene and unassuming presence, vibrant colors highlighting their peaceful anonymity\n        "
                         ]
                     },
                     {
@@ -398,7 +398,7 @@
                             "Node name for S&R": "CLIPTextEncode"
                         },
                         "widgets_values": [
-                            "blurry, low quality, text, deformed, dark or overly shadowed, cluttered background"
+                            "blurry, low quality, text, deformed, crowded, dark, ominous, chaotic"
                         ]
                     }
                 ],
@@ -480,13 +480,13 @@
                 "config": {},
                 "extra": {
                     "ds": {
-                        "scale": 0.6830134553650705,
+                        "scale": 1,
                         "offset": [
-                            -8.218806850546201,
-                            356.22217400604734
+                            -140.8515625,
+                            -196.76953125
                         ]
                     },
-                    "frontendVersion": "1.20.5"
+                    "frontendVersion": "1.21.6"
                 },
                 "version": 0.4
             }

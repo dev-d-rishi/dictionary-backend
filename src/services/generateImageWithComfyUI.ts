@@ -3,6 +3,8 @@ import PromptJSON from "../mock/prompt.json";
 import AWS from "aws-sdk";
 import dotenv from "dotenv";
 
+const comfyURL = 'https://c915-34-74-12-220.ngrok-free.app'
+
 dotenv.config();
 
 AWS.config.update({
@@ -18,7 +20,7 @@ export async function sendPromptAPI(positive: string, negative: string) {
   PromptJSON.prompt["6"].inputs.text = positive;
   PromptJSON.prompt["7"].inputs.text = negative;
   try {
-    const response = await axios.post("http://0.0.0.0:8188/prompt", PromptJSON);
+    const response = await axios.post(`${comfyURL}/prompt`, PromptJSON);
     console.log("Prompt response:", response.data);
     return response.data.prompt_id;
   } catch (error: any) {
@@ -32,7 +34,7 @@ export async function sendPromptAPI(positive: string, negative: string) {
 
 export async function getPromptHistory(promptId: string) {
   try {
-    const response = await axios.get(`http://0.0.0.0:8188/history/${promptId}`);
+    const response = await axios.get(`${comfyURL}/history/${promptId}`);
     console.log("Prompt history response:", response.data);
     return response.data;
   } catch (error) {
@@ -42,7 +44,7 @@ export async function getPromptHistory(promptId: string) {
 }
 
 export async function getImage(filename: string): Promise<string> {
-  return `http://0.0.0.0:8188/view?filename=${encodeURIComponent(filename)}`;
+  return `${comfyURL}/view?filename=${encodeURIComponent(filename)}`;
 }
 
 export async function uploadImageToS3(imageUrl: any, filename: any) {
