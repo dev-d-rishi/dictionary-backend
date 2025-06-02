@@ -11,35 +11,35 @@ const JWT_SECRET = "your_jwt_secret_key";
 // Register Route
 router.post("/register", async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { username, email, password } = req.body;
 
-    // Validate input
-    if (!name || !email || !password) {
+    if (!username || !email || !password) {
       res.status(400).json({
-        message: "All fields are required: name, email, and password",
+        message: "All fields are required: username, email, and password",
       });
       return;
     }
 
-    // Check for existing user
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
       res.status(409).json({ message: "User already exists with this email" });
       return;
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+      res.status(409).json({ message: "Username is already taken" });
+      return;
+    }
 
-    // Create user
+    const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({
-      name,
+      username,
       email,
       password: hashedPassword,
       isAdmin: false,
     });
 
-    // Generate JWT token
     const token = jwt.sign(
       { id: user._id, isAdmin: user.isAdmin },
       JWT_SECRET,
@@ -47,7 +47,6 @@ router.post("/register", async (req, res) => {
     );
 
     res.status(201).json({ message: "User registered successfully", token });
-    return;
   } catch (err: any) {
     console.error("Registration Error:", err);
     res.status(500).json({
@@ -63,7 +62,18 @@ router.post("/login", async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+    if (!email || !password) {
+      res
+        .status(400)
+        .json({ message: "Email/Username and password are required" });
+      return;
+    }
+
+    // Find user by email or username
+    const user = await User.findOne({
+      $or: [{ email: email }, { username: email }],
+    });
+
     if (!user) {
       res.status(404).json({ message: "User not found" });
       return;
@@ -85,14 +95,15 @@ router.post("/login", async (req: Request, res: Response) => {
       token,
       user: {
         id: user._id,
-        name: user.name,
+        username: user.username,
         email: user.email,
         isAdmin: user.isAdmin,
       },
     });
     return;
-  } catch (err) {
-    res.status(500).json({ message: "Server error" });
+  } catch (err: any) {
+    console.error("Login Error:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 });
 
