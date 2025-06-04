@@ -10,13 +10,13 @@ router.get("/:term", async (req, res) => {
 
     const existing = await words.findOne({ word: term });
     // if (existing) return res.json(existing);
-    console.log("Existing word:", existing);
+    //console.log("Existing word:", existing);
 
     const wordData = await getWordDetails(term);
-    console.log("Word data to be saved:", wordData);
+    //console.log("Word data to be saved:", wordData);
 
     const saved = await words.create(wordData);
-    console.log("Word saved successfully:", saved); // ✅ Confirmation log
+    //console.log("Word saved successfully:", saved); // ✅ Confirmation log
 
     res.json(saved);
   } catch (err) {

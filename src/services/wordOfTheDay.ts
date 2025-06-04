@@ -9,7 +9,7 @@ export async function getRandomWordFromOpenAI(): Promise<string> {
     model: "gpt-4.1-nano",
     messages: [{ role: "user", content: prompt }],
   });
-  console.log("Response from OpenAI:", response);
+  //console.log("Response from OpenAI:", response);
   const word = response.choices[0].message.content || "";
   return word;
 }

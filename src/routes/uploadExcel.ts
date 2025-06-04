@@ -62,7 +62,7 @@ router.post("/upload-excel", upload.single("file"), async (req, res) => {
       { words: uniqueWords }
     );
 
-    res.json({ words: response.data });
+    res.json({ words: response.data.words.data.length });
   } catch (error: any) {
     console.error("File Upload Error:", error?.response?.data || error.message);
     res.status(500).json({ error: error?.response?.data || error.message || "Failed to process file" });

@@ -39,8 +39,6 @@ export async function getWordDetails(word: string): Promise<WordDetails> {
         "antonyms": string[],          // List of antonyms (if available)
         "memoryTrick": string,         // A memory trick or way to remember the word
         "origin": string,              // Short origin story or etymology
-        "positivePrompt": string,      // Describe a detailed, realistic, cinematic-quality scene that visually represents the meaning or emotion of the word. Use vivid imagery and natural elements (e.g., "A lone tree standing strong in a stormy field, under a dramatic sky").
-        "negativePrompt": string       // Describe what to avoid in the generated image (e.g., "blurry, unrealistic anatomy, extra limbs, cartoon style, text, distorted faces").
     }
 
     Make sure the JSON is correctly formatted with double quotes, no extra text outside the JSON object, and all keys are present (use empty strings or empty arrays if some info is missing).

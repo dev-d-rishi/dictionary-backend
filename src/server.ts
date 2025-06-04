@@ -46,14 +46,14 @@ app.get("/hello", (req, res) => {
 app.get("/define/:word", async (req, res) => {
   try {
     const term = req.params.word.toLowerCase();
-    console.log("🔍 Searching for word:", term);
+    //console.log("🔍 Searching for word:", term);
 
     const existing = await words.findOne({ word: term });
-    console.log("📦 Found existing entry:", existing ? "Yes" : "No");
+    //console.log("📦 Found existing entry:", existing ? "Yes" : "No");
 
     if (existing) {
       if (existing.imageURL) {
-        console.log("🖼️ Image already exists, skipping prompt.");
+        //console.log("🖼️ Image already exists, skipping prompt.");
         res.json({
           term: term,
           result: existing,
@@ -63,7 +63,7 @@ app.get("/define/:word", async (req, res) => {
       }
 
       if (existing.promptId) {
-        console.log("⚡ Prompt ID already exists, skipping prompt generation.");
+        //console.log("⚡ Prompt ID already exists, skipping prompt generation.");
         res.json({
           term: term,
           result: existing,
@@ -72,11 +72,8 @@ app.get("/define/:word", async (req, res) => {
         return;
       }
 
-      const promptId = await sendPromptAPI(
-        existing.positivePrompt,
-        existing.negativePrompt
-      );
-      console.log("🚀 Prompt sent for existing word. ID:", promptId);
+      const promptId = await sendPromptAPI(existing.exampleSentence);
+      //console.log("🚀 Prompt sent for existing word. ID:", promptId);
 
       await words.updateOne({ word: term }, { $set: { promptId } });
 
@@ -84,21 +81,18 @@ app.get("/define/:word", async (req, res) => {
       return;
     }
 
-    console.log("🆕 Word not found, generating new entry...");
+    //console.log("🆕 Word not found, generating new entry...");
     const wordData = await getWordDetails(term);
-    console.log("📘 Generated word data:", wordData);
+    //console.log("📘 Generated word data:", wordData);
 
-    const promptId = await sendPromptAPI(
-      wordData.positivePrompt,
-      wordData.negativePrompt
-    );
-    console.log("🚀 Prompt sent for new word. ID:", promptId);
+    const promptId = await sendPromptAPI(wordData.exampleSentence);
+    //console.log("🚀 Prompt sent for new word. ID:", promptId);
 
     // Add promptId before saving
     wordData.promptId = promptId;
 
     const savedWord = await words.create(wordData);
-    console.log("✅ New word saved to database with prompt ID.");
+    //console.log("✅ New word saved to database with prompt ID.");
 
     res.json({ term, result: savedWord, promptId });
   } catch (err) {
@@ -118,7 +112,7 @@ app.get("/define/:word", async (req, res) => {
 //     // const imageUrl = `http://0.0.0.0:8188/api/view?filename=${filename}`;
 
 //     const imageURL = await uploadImageToS3(filename, filename);
-//     console.log("✅ Image uploaded to S3:", imageURL);
+//     //console.log("✅ Image uploaded to S3:", imageURL);
 //     res.json({ success: true, imageURL });
 //     return;
 //   } catch (err) {
@@ -130,9 +124,9 @@ app.get("/define/:word", async (req, res) => {
 app.get("/getImageURL/:promptId/:word", async (req, res) => {
   try {
     const { promptId, word } = req.params;
-    console.log("Received request to get image URL");
-    console.log("Prompt ID:", promptId);
-    console.log("Word:", word);
+    //console.log("Received request to get image URL");
+    //console.log("Prompt ID:", promptId);
+    //console.log("Word:", word);
 
     const waitForImageFilename = async (
       promptId: string,
@@ -140,20 +134,20 @@ app.get("/getImageURL/:promptId/:word", async (req, res) => {
       delay = 4000
     ) => {
       for (let i = 0; i < retries; i++) {
-        console.log(`Polling attempt ${i + 1}...`);
+        //console.log(`Polling attempt ${i + 1}...`);
         const history = await getPromptHistory(promptId);
         const outputNode = history?.[promptId]?.outputs?.["9"];
 
         if (!outputNode) {
-          console.log("No output node found in history yet.");
+          //console.log("No output node found in history yet.");
         }
 
         if (outputNode?.images?.length > 0 && outputNode.images[0].filename) {
-          console.log("Image filename found:", outputNode.images[0].filename);
+          //console.log("Image filename found:", outputNode.images[0].filename);
           return outputNode.images[0].filename;
         }
 
-        console.log("Image not ready, waiting...");
+        //console.log("Image not ready, waiting...");
         await new Promise((resolve) => setTimeout(resolve, delay));
       }
       return null;
@@ -161,28 +155,28 @@ app.get("/getImageURL/:promptId/:word", async (req, res) => {
 
     const filename = await waitForImageFilename(promptId);
     if (!filename) {
-      console.log("Image filename not available after polling.");
+      //console.log("Image filename not available after polling.");
       res.status(202).json({ message: "Image not ready", status: "pending" });
       return;
     }
 
-    console.log("Fetching image using filename:", filename);
+    //console.log("Fetching image using filename:", filename);
     const imageURL = await getImage(filename);
 
     if (!imageURL) {
-      console.log("Failed to retrieve image URL from getImage.");
+      //console.log("Failed to retrieve image URL from getImage.");
       res.status(500).json({ error: "Failed to retrieve image URL" });
       return;
     }
     const imageAWSURL = await uploadImageToS3(imageURL, filename);
-    console.log("Updating word document with imageURL...");
+    //console.log("Updating word document with imageURL...");
     const updated = await words.findOneAndUpdate(
       { word: new RegExp(`^${word}$`, "i") },
       { $set: { imageURL: imageAWSURL } },
       { new: true }
     );
 
-    console.log("Image URL successfully retrieved and saved:");
+    //console.log("Image URL successfully retrieved and saved:");
     res.json({ word, imageURL, status: "success", updated });
     return;
   } catch (err) {

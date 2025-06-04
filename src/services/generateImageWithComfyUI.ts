@@ -3,7 +3,7 @@ import PromptJSON from "../mock/prompt.json";
 import AWS from "aws-sdk";
 import dotenv from "dotenv";
 
-const comfyURL = 'https://c915-34-74-12-220.ngrok-free.app'
+const comfyURL = 'https://6056-34-127-0-113.ngrok-free.app'
 
 dotenv.config();
 
@@ -15,13 +15,12 @@ AWS.config.update({
 
 const s3 = new AWS.S3();
 
-export async function sendPromptAPI(positive: string, negative: string) {
+export async function sendPromptAPI(meaning: string) {
   // PromptJSON
-  PromptJSON.prompt["6"].inputs.text = positive;
-  PromptJSON.prompt["7"].inputs.text = negative;
+  PromptJSON.prompt["6"].inputs.text = `Generate image for: ${meaning}`;
+  PromptJSON.prompt["7"].inputs.text = 'blurry, low quality, low resolution, deformed, distorted, duplicate, extra limbs, poorly drawn hands, missing fingers, text, watermark, cropped, out of frame, unnatural colors, grainy, noisy, wrong proportions, unbalanced lighting, glitch, oversaturated, anatomical errors, artifacts';
   try {
     const response = await axios.post(`${comfyURL}/prompt`, PromptJSON);
-    console.log("Prompt response:", response.data);
     return response.data.prompt_id;
   } catch (error: any) {
     console.error(
@@ -35,7 +34,7 @@ export async function sendPromptAPI(positive: string, negative: string) {
 export async function getPromptHistory(promptId: string) {
   try {
     const response = await axios.get(`${comfyURL}/history/${promptId}`);
-    console.log("Prompt history response:", response.data);
+    //console.log("Prompt history response:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching prompt history:", error);

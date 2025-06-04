@@ -20,14 +20,11 @@ export const defineManyWords = async (req: Request, res: Response) => {
 
     for (const termRaw of wordArray) {
       const term = termRaw.toLowerCase();
-      console.log("🔍 Searching for word:", term);
 
       let existing = await words.findOne({ word: term });
-      console.log("📦 Found existing entry:", existing ? "Yes" : "No");
 
       if (existing) {
         if (existing.imageURL || existing.promptId) {
-          console.log("⚡ Skipping image/prompt generation for:", term);
           results.push({
             term,
             result: existing,
@@ -35,12 +32,10 @@ export const defineManyWords = async (req: Request, res: Response) => {
           });
           continue;
         }
-
-        const promptId = await sendPromptAPI(
-          existing.positivePrompt,
-          existing.negativePrompt
+        console.log(
+          `🆕 Word "${term}" found, checking for prompt ID...: ${existing.exampleSentence}`
         );
-        console.log("🚀 Prompt sent for existing word. ID:", promptId);
+        const promptId = await sendPromptAPI(existing.exampleSentence);
 
         await words.updateOne({ word: term }, { $set: { promptId } });
         existing.promptId = promptId;
@@ -48,21 +43,17 @@ export const defineManyWords = async (req: Request, res: Response) => {
         continue;
       }
 
-      console.log("🆕 Word not found, generating new entry...");
       const wordData = await getWordDetails(term);
-      console.log("📘 Generated word data:", wordData);
 
-      const promptId = await sendPromptAPI(
-        wordData.positivePrompt,
-        wordData.negativePrompt
+      console.log(
+        `🆕 Word "${term}" found, checking for prompt ID...: ${wordData.exampleSentence}`
       );
-      console.log("🚀 Prompt sent for new word. ID:", promptId);
+      const promptId = await sendPromptAPI(wordData.exampleSentence);
 
       wordData.word = term;
       wordData.promptId = promptId;
 
       const savedWord = await words.create(wordData);
-      console.log("✅ New word saved:", term);
 
       results.push({ term, result: savedWord, promptId });
     }
@@ -80,7 +71,6 @@ const waitForImageFilename = async (
   delay = 4000
 ): Promise<string | null> => {
   for (let i = 0; i < retries; i++) {
-    console.log(`Polling [${promptId}] - Attempt ${i + 1}`);
     const history = await getPromptHistory(promptId);
     const outputNode = history?.[promptId]?.outputs?.["9"];
 
