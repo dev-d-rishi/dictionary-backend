@@ -12,6 +12,7 @@ import {
   sendPromptAPI,
   uploadImageToS3,
 } from "./services/generateImageWithComfyUI";
+import authRoutes from "./routes/auth";
 import allWordsRoutes from "./routes/allWords";
 import uploadExcelRouter from "./routes/uploadExcel";
 import AWS from "aws-sdk";
@@ -213,6 +214,8 @@ app.get("/wordoftheday", async (req, res) => {
     res.status(500).json({ error: "Could not fetch word of the day" });
   }
 });
+
+app.use('/auth', authRoutes);
 
 app.use("/admin/allWords", allWordsRoutes);
 
