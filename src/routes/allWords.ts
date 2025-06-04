@@ -1,6 +1,7 @@
 // routes/allWords.ts
 import express from "express";
 import { getAllWords, deleteWord } from "../services/admin/allWords";
+import { defineManyWords, getImagesByWords } from "../services/admin/imageGen";
 
 const router = express.Router();
 
@@ -32,6 +33,24 @@ router.delete("/", async (req, res) => {
     res.json({ success });
   } catch (err) {
     console.error("❌ Error deleting word:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.post("/define-many", async (req, res) => {
+  try {
+    await defineManyWords(req, res);
+  } catch (err) {
+    console.error("❌ Error in /define-many:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.post("/getImagesByWords", async (req, res) => {
+  try {
+    await getImagesByWords(req, res);
+  } catch (err) {
+    console.error("❌ Error in /getImagesByWords:", err);
     res.status(500).json({ error: "Internal server error" });
   }
 });
