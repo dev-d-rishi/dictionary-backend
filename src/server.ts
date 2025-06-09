@@ -63,15 +63,15 @@ app.get("/define/:word", async (req, res) => {
         return;
       }
 
-      if (existing.promptId) {
-        //console.log("⚡ Prompt ID already exists, skipping prompt generation.");
-        res.json({
-          term: term,
-          result: existing,
-          promptId: existing.promptId,
-        });
-        return;
-      }
+      // if (existing.promptId) {
+      //   //console.log("⚡ Prompt ID already exists, skipping prompt generation.");
+      //   res.json({
+      //     term: term,
+      //     result: existing,
+      //     promptId: existing.promptId,
+      //   });
+      //   return;
+      // }
 
       const promptId = await sendPromptAPI(existing.exampleSentence);
       //console.log("🚀 Prompt sent for existing word. ID:", promptId);
@@ -215,7 +215,7 @@ app.get("/wordoftheday", async (req, res) => {
   }
 });
 
-app.use('/auth', authRoutes);
+app.use("/auth", authRoutes);
 
 app.use("/admin/allWords", allWordsRoutes);
 
