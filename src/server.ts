@@ -4,6 +4,7 @@ import app from "./app";
 import { getWordDetails } from "./services/wordServices";
 import connectDB from "./database";
 import words from "./models/words";
+import subjectRouter from "./routes/subject";
 import wordOfTheDay from "./models/wordOfTheDay";
 import { getRandomWordFromOpenAI } from "./services/wordOfTheDay";
 import {
@@ -185,6 +186,7 @@ app.get("/getImageURL/:promptId/:word", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch image" });
   }
 });
+app.use("/api/subject", subjectRouter);
 
 app.get("/wordoftheday", async (req, res) => {
   try {
