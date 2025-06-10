@@ -29,6 +29,7 @@ router.post("/add", async (req, res) => {
 // Get words for a subject
 // routes/subject.ts
 router.get("/:subject", async (req, res) => {
+  console.log("🎯 Subject route hit:", req.params.subject);
   try {
     const subject = req.params.subject;
     const data = await getSubjectWords(subject);
