@@ -30,10 +30,16 @@ const s3 = new AWS.S3();
 
 // Load environment variables
 
-const PORT = process.env.PORT;
-
 // Enable CORS
 app.use(cors());
+
+const PORT = process.env.PORT || 5000;
+
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+});
 
 // Default route
 app.get("/", (req, res) => {
@@ -224,8 +230,4 @@ app.use("/api", uploadExcelRouter);
 
 app.use("/api/subject", subjectRouter);
 
-connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
-});
+
