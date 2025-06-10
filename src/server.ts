@@ -186,7 +186,6 @@ app.get("/getImageURL/:promptId/:word", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch image" });
   }
 });
-app.use("/api/subject", subjectRouter);
 
 app.get("/wordoftheday", async (req, res) => {
   try {
@@ -222,6 +221,8 @@ app.use("/auth", authRoutes);
 app.use("/admin/allWords", allWordsRoutes);
 
 app.use("/api", uploadExcelRouter);
+
+app.use("/api/subject", subjectRouter);
 
 connectDB().then(() => {
   app.listen(PORT, () => {

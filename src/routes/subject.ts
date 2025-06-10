@@ -1,6 +1,7 @@
 import express from "express";
 import {
   addSubjectWords,
+  assignImageToSubjectWord,
   getSubjectWords,
   uploadSubjectWords,
 } from "../services/subjectWord";
@@ -73,6 +74,42 @@ router.post("/upload", upload.single("file"), async (req, res) => {
 
     // Call uploadSubjectWords with subject and list of words
     const data = await uploadSubjectWords(subject, words);
+
+    // Delete the uploaded file after processing
+    fs.unlinkSync(file.path);
+
+    res.status(200).json({ success: true, data });
+  } catch (err) {
+    console.error("❌ Error uploading subject words:", err);
+    res.status(500).json({ error: "Server error." });
+  }
+});
+
+router.post("/assign", upload.single("file"), async (req, res) => {
+  try {
+    const { subject } = req.body;
+    const file = req.file;
+
+    if (!subject || !file) {
+      res.status(400).json({ error: "Subject and file are required." });
+      return;
+    }
+
+    // Read file content and extract word list
+    const content = fs.readFileSync(file.path, "utf-8");
+    const words = content
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter((line) => line);
+
+    if (words.length === 0) {
+      fs.unlinkSync(file.path);
+      res.status(400).json({ error: "No valid words found in the file." });
+      return;
+    }
+
+    // Call uploadSubjectWords with subject and list of words
+    const data = await assignImageToSubjectWord(subject, words);
 
     // Delete the uploaded file after processing
     fs.unlinkSync(file.path);

@@ -5,6 +5,12 @@ import multer from "multer";
 import { OpenAI } from "openai";
 import dotenv from "dotenv";
 import { WordDetails } from "./wordServices";
+import {
+  getImage,
+  getPromptHistory,
+  sendPromptAPI,
+  uploadImageToS3,
+} from "./generateImageWithComfyUI";
 
 dotenv.config();
 
@@ -106,6 +112,151 @@ export const uploadSubjectWords = async (
     console.error("❌ Error in uploadSubjectWords:", err);
     throw err;
   }
+};
+
+export const generateImageForSubject = async (
+  subject: string,
+  wordList: string[]
+) => {
+  try {
+    const cleanedWords = wordList
+      .map((w) => w.trim().toLowerCase())
+      .filter(Boolean);
+
+    const subjectEntry = await SubjectWords.findOne({
+      subject: new RegExp(`^${subject}$`, "i"),
+    });
+
+    if (!subjectEntry) {
+      throw new Error(`Subject "${subject}" not found`);
+    }
+
+    const results = [];
+
+    for (const term of cleanedWords) {
+      const existingWord = subjectEntry.words.find(
+        (w: any) => w.word.toLowerCase() === term
+      );
+
+      if (!existingWord) {
+        results.push({ term, error: "Word not found in subject." });
+        continue;
+      }
+
+      // Skip if imageURL exists
+      if (existingWord.imageURL) {
+        results.push({
+          term,
+          result: { word: existingWord.word },
+          promptId: existingWord.promptId || null,
+        });
+        continue;
+      }
+
+      const promptId = await sendPromptAPI(existingWord.exampleSentence ?? "");
+
+      existingWord.promptId = promptId;
+      // You could also add `imageURL` here after generating the image externally
+
+      results.push({
+        term,
+        result: { word: existingWord.word },
+        promptId,
+      });
+    }
+
+    // Save changes
+    await subjectEntry.save();
+
+    return {
+      success: true,
+      subject,
+      data: results,
+    };
+  } catch (error) {
+    console.error("❌ Error generating image for subject:", error);
+    throw error;
+  }
+};
+
+export const assignImageToSubjectWord = async (
+  subject: string,
+  wordList: string[]
+) => {
+  try {
+    const results: any[] = [];
+
+    const subjectDoc = await SubjectWords.findOne({ subject: new RegExp(`^${subject}$`, "i") });
+    if (!subjectDoc) {
+      throw new Error(`Subject "${subject}" not found`);
+    }
+
+    for (const word of wordList) {
+      const wordObj = subjectDoc.words.find((w: any) =>
+        w.word.toLowerCase() === word.toLowerCase()
+      );
+
+      if (!wordObj || wordObj.imageURL) {
+        results.push({ word, status: "skipped", reason: "Image already exists" });
+        continue;
+      }
+
+      if (!wordObj || !wordObj.promptId) {
+        results.push({ word, status: "skipped", reason: "promptId not found" });
+        continue;
+      }
+
+      const filename = await waitForImageFilename(wordObj.promptId);
+      if (!filename) {
+        results.push({ word, status: "pending", reason: "Image not ready" });
+        continue;
+      }
+
+      const imageURL = await getImage(filename);
+      if (!imageURL) {
+        results.push({ word, status: "failed", reason: "Failed to retrieve image URL" });
+        continue;
+      }
+
+      const imageAWSURL = await uploadImageToS3(imageURL, filename);
+
+      const updated = await SubjectWords.findOneAndUpdate(
+        {
+          subject: new RegExp(`^${subject}$`, "i"),
+          "words.word": new RegExp(`^${word}$`, "i"),
+        },
+        {
+          $set: { "words.$.imageURL": imageAWSURL },
+        },
+        { new: true }
+      );
+
+      results.push({ word, status: "success", imageURL: imageAWSURL, updated });
+    }
+
+    return { subject, status: "done", results };
+  } catch (error) {
+    console.error("❌ Error in assignImageToSubjectWord:", error);
+    throw new Error("Failed to assign images to subject words");
+  }
+};
+
+const waitForImageFilename = async (
+  promptId: string,
+  retries = 150,
+  delay = 4000
+): Promise<string | null> => {
+  for (let i = 0; i < retries; i++) {
+    const history = await getPromptHistory(promptId);
+    const outputNode = history?.[promptId]?.outputs?.["9"];
+
+    if (outputNode?.images?.length > 0 && outputNode.images[0].filename) {
+      return outputNode.images[0].filename;
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, delay));
+  }
+  return null;
 };
 
 async function getWordDetailsInContext(word: string, subject: string) {
