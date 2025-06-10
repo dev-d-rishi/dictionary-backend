@@ -27,6 +27,7 @@ const allowedOrigins = [
 
 app.use(cors(corsOptions));
 app.use(express.json());
-app.use(limiter); // Apply rate limiting to all requests
+app.set('trust proxy', 1);
+// app.use(limiter); // Apply rate limiting to all requests
 
 export default app;
