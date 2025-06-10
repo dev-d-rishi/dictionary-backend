@@ -4,7 +4,6 @@ import app from "./app";
 import { getWordDetails } from "./services/wordServices";
 import connectDB from "./database";
 import words from "./models/words";
-import subjectRouter from "./routes/subject";
 import wordOfTheDay from "./models/wordOfTheDay";
 import { getRandomWordFromOpenAI } from "./services/wordOfTheDay";
 import {
@@ -17,6 +16,7 @@ import authRoutes from "./routes/auth";
 import allWordsRoutes from "./routes/allWords";
 import uploadExcelRouter from "./routes/uploadExcel";
 import AWS from "aws-sdk";
+import subjectRouter from "./routes/subject";
 
 dotenv.config();
 
@@ -222,10 +222,15 @@ app.get("/wordoftheday", async (req, res) => {
   }
 });
 
+app.use("/api/subject", subjectRouter);
+
+app.use("/api", uploadExcelRouter);
+
 app.use("/auth", authRoutes);
 
 app.use("/admin/allWords", allWordsRoutes);
 
-app.use("/api", uploadExcelRouter);
-
-app.use("/api/subject", subjectRouter);
+app.use("*", (req, res) => {
+  console.log("❌ Unmatched route:", req.originalUrl);
+  res.status(404).send("Not found");
+});
