@@ -3,7 +3,7 @@ import PromptJSON from "../mock/prompt.json";
 import AWS from "aws-sdk";
 import dotenv from "dotenv";
 
-const comfyURL = 'https://6056-34-127-0-113.ngrok-free.app'
+const comfyURL = 'https://aa93-34-66-176-12.ngrok-free.app'
 
 dotenv.config();
 
@@ -15,10 +15,10 @@ AWS.config.update({
 
 const s3 = new AWS.S3();
 
-export async function sendPromptAPI(meaning: string) {
+export async function sendPromptAPI(positive: string,) {
   // PromptJSON
-  PromptJSON.prompt["6"].inputs.text = `Generate image for: ${meaning}`;
-  PromptJSON.prompt["7"].inputs.text = 'blurry, low quality, low resolution, deformed, distorted, duplicate, extra limbs, poorly drawn hands, missing fingers, text, watermark, cropped, out of frame, unnatural colors, grainy, noisy, wrong proportions, unbalanced lighting, glitch, oversaturated, anatomical errors, artifacts';
+  PromptJSON.prompt["6"].inputs.text = `${positive} realistic, high quality, detailed, sharp focus, vibrant colors, cinematic lighting, professional photography, clear resolution, masterpiece, hyper-realistic, `;
+  PromptJSON.prompt["7"].inputs.text = 'blurry, cartoon, painting, illustration, low resolution, deformed body, extra limbs, bad anatomy, distorted face, unrealistic proportions, CGI, watermark, nudity, artifacts, oversaturated, duplicate limbs, fused fingers'
   try {
     const response = await axios.post(`${comfyURL}/prompt`, PromptJSON);
     return response.data.prompt_id;

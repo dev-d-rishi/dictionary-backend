@@ -11,17 +11,27 @@ export async function getAllWords({
   search?: string;
 }) {
   const skip = (page - 1) * limit;
-  const query = search
-    ? { word: { $regex: new RegExp(search, "i") } }
-    : {};
+  const query = search ? { word: { $regex: new RegExp(search, "i") } } : {};
 
-  const [wordsArray, total] = await Promise.all([
-    words.find(query).skip(skip).limit(limit).sort({ word: 1 }),
+  const [wordDocs, total] = await Promise.all([
+    words
+      .find(query, {
+        word: 1,
+        exampleSentence: 1,
+        positivePrompt: 1,
+        imageURL: 1,
+        _id: 0,
+        promptId: 1,
+        meaning: 1,
+      }) // select specific fields
+      .skip(skip)
+      .limit(limit)
+      .sort({ word: 1 }),
     words.countDocuments(query),
   ]);
 
   return {
-    wordsArray,
+    wordsArray: wordDocs,
     total,
     page,
     totalPages: Math.ceil(total / limit),

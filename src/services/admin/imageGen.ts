@@ -24,7 +24,7 @@ export const defineManyWords = async (req: Request, res: Response) => {
       let existing = await words.findOne({ word: term });
 
       if (existing) {
-        if (existing.imageURL || existing.promptId) {
+        if (existing.imageURL) {
           results.push({
             term,
             result: existing,
@@ -39,7 +39,7 @@ export const defineManyWords = async (req: Request, res: Response) => {
 
         await words.updateOne({ word: term }, { $set: { promptId } });
         existing.promptId = promptId;
-        results.push({ term, result: existing, promptId });
+        results.push({ term, result: {word: existing.word}, promptId });
         continue;
       }
 
@@ -55,7 +55,7 @@ export const defineManyWords = async (req: Request, res: Response) => {
 
       const savedWord = await words.create(wordData);
 
-      results.push({ term, result: savedWord, promptId });
+      results.push({ term, result: {word: savedWord.word}, promptId });
     }
 
     res.status(200).json({ success: true, data: results });
@@ -130,14 +130,22 @@ export const getImagesByWords = async (req: Request, res: Response) => {
           continue;
         }
 
-        const s3URL = await uploadImageToS3(imageURL, filename);
+        // Use the word as the filename for S3
+        const cleanFilename = `${word.toLowerCase().replace(/\s+/g, "_")}.png`;
+        const s3URL = await uploadImageToS3(imageURL, cleanFilename);
+
         const updated = await words.findOneAndUpdate(
           { word: new RegExp(`^${word}$`, "i") },
           { $set: { imageURL: s3URL } },
           { new: true }
         );
 
-        results.push({ word:{word:word.word, imageURL: word.imageURL}, imageURL: s3URL, status: "success", updated });
+        results.push({
+          word,
+          imageURL: s3URL,
+          status: "success",
+          updated,
+        });
       } catch (err: any) {
         console.error(`❌ Error for word "${word}":`, err);
         results.push({ word, status: "error", message: err.message });
