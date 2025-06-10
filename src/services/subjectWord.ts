@@ -43,27 +43,20 @@ export const addSubjectWords = async (req: Request, res: Response) => {
 };
 
 // Get subject words with their meaning
-export const getSubjectWords = async (req: Request, res: Response) => {
-  try {
-    const subject = req.params.subject;
-
-    if (!subject) {
-      return res.status(400).json({ error: "Subject is required." });
-    }
-
-    const result = await SubjectWords.findOne({
-      subject: new RegExp(`^${subject}$`, "i"),
-    });
-
-    if (!result) {
-      return res.status(404).json({ error: "Subject not found." });
-    }
-
-    res.status(200).json({ success: true, data: result });
-  } catch (err) {
-    console.error("❌ Error fetching subject words:", err);
-    res.status(500).json({ error: "Server error." });
+export const getSubjectWords = async (subject: string) => {
+  if (!subject) {
+    throw new Error("Subject is required.");
   }
+
+  const result = await SubjectWords.findOne({
+    subject: new RegExp(`^${subject}$`, "i"),
+  });
+
+  if (!result) {
+    throw new Error("Subject not found.");
+  }
+
+  return result;
 };
 
 export const uploadSubjectWords = async (

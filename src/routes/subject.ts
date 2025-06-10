@@ -27,10 +27,11 @@ router.post("/add", async (req, res) => {
 });
 
 // Get words for a subject
+// routes/subject.ts
 router.get("/:subject", async (req, res) => {
   try {
     const subject = req.params.subject;
-    const data = await getSubjectWords(req, res);
+    const data = await getSubjectWords(subject);
 
     if (!data) {
       res.status(404).json({ error: "Subject not found." });
@@ -38,9 +39,11 @@ router.get("/:subject", async (req, res) => {
     }
 
     res.status(200).json({ success: true, data });
-  } catch (err) {
-    console.error("❌ Error getting subject words:", err);
-    res.status(500).json({ error: "Server error." });
+    return;
+  } catch (err: any) {
+    console.error("❌ Error getting subject words:", err.message);
+    res.status(500).json({ error: err.message || "Server error." });
+    return;
   }
 });
 
