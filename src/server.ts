@@ -30,7 +30,7 @@ const s3 = new AWS.S3();
 
 // Load environment variables
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 
 // Enable CORS
 app.use(cors());
