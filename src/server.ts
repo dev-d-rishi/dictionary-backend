@@ -222,7 +222,7 @@ app.get("/wordoftheday", async (req, res) => {
   }
 });
 
-app.use("/api/subject", subjectRouter);
+app.use("/subject", subjectRouter);
 
 app.use("/api", uploadExcelRouter);
 
