@@ -228,6 +228,6 @@ app.use("/admin/allWords", allWordsRoutes);
 
 app.use("/api", uploadExcelRouter);
 
-app.use("/api/subject", subjectRouter);
-
-
+app.use("/api/subject", () => {
+  console.log("Subject router initialized");
+});
