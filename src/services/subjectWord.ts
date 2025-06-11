@@ -112,32 +112,68 @@ export const generateImageForSubject = async (
   wordList: string[]
 ) => {
   try {
+    console.log("🔍 Starting image generation for subject:", subject);
+    console.log("📜 Received word list:", wordList);
+
     const cleanedWords = wordList
       .map((w) => w.trim().toLowerCase())
       .filter(Boolean);
 
-    const subjectEntry = await SubjectWords.findOne({
+    console.log("🧹 Cleaned word list:", cleanedWords);
+
+    let subjectEntry = await SubjectWords.findOne({
       subject: new RegExp(`^${subject}$`, "i"),
     });
 
     if (!subjectEntry) {
-      throw new Error(`Subject "${subject}" not found`);
+      console.warn(
+        `⚠️ Subject "${subject}" not found. Creating new subject entry.`
+      );
+      subjectEntry = new SubjectWords({ subject, words: [] });
     }
 
     const results = [];
 
     for (const term of cleanedWords) {
-      const existingWord = subjectEntry.words.find(
+      console.log("🔎 Processing term:", term);
+
+      let existingWord = subjectEntry.words.find(
         (w: any) => w.word.toLowerCase() === term
       );
 
+      // If word doesn't exist, generate details and add it
       if (!existingWord) {
-        results.push({ term, error: "Word not found in subject." });
+        console.log(
+          `🆕 Word "${term}" not found in subject. Generating details...`
+        );
+        const wordDetails = await getWordDetailsInContext(term, subject);
+        if (!wordDetails) {
+          console.warn(`⚠️ No details found for "${term}"`);
+          results.push({ term, error: "Word details could not be fetched." });
+          continue;
+        }
+
+        const promptId = await sendPromptAPI(wordDetails.exampleSentence ?? "");
+        console.log(`✅ Prompt ID received for new word "${term}":`, promptId);
+
+        const newWord = {
+          ...wordDetails,
+          word: wordDetails.word.toLowerCase(),
+          promptId,
+        };
+
+        subjectEntry.words.push(newWord);
+        results.push({
+          term,
+          result: { word: newWord.word },
+          promptId,
+        });
+
         continue;
       }
 
-      // Skip if imageURL exists
       if (existingWord.imageURL) {
+        console.log(`🖼️ Skipping "${term}" — image already exists.`);
         results.push({
           term,
           result: { word: existingWord.word },
@@ -146,10 +182,11 @@ export const generateImageForSubject = async (
         continue;
       }
 
+      console.log(`📤 Sending prompt for "${term}"...`);
       const promptId = await sendPromptAPI(existingWord.exampleSentence ?? "");
+      console.log(`✅ Prompt ID received for "${term}":`, promptId);
 
       existingWord.promptId = promptId;
-      // You could also add `imageURL` here after generating the image externally
 
       results.push({
         term,
@@ -158,9 +195,11 @@ export const generateImageForSubject = async (
       });
     }
 
-    // Save changes
+    // Save updates to the subject entry
+    console.log("💾 Saving updates to subject document...");
     await subjectEntry.save();
 
+    console.log("✅ Image generation process completed.");
     return {
       success: true,
       subject,
@@ -179,18 +218,24 @@ export const assignImageToSubjectWord = async (
   try {
     const results: any[] = [];
 
-    const subjectDoc = await SubjectWords.findOne({ subject: new RegExp(`^${subject}$`, "i") });
+    const subjectDoc = await SubjectWords.findOne({
+      subject: new RegExp(`^${subject}$`, "i"),
+    });
     if (!subjectDoc) {
       throw new Error(`Subject "${subject}" not found`);
     }
 
     for (const word of wordList) {
-      const wordObj = subjectDoc.words.find((w: any) =>
-        w.word.toLowerCase() === word.toLowerCase()
+      const wordObj = subjectDoc.words.find(
+        (w: any) => w.word.toLowerCase() === word.toLowerCase()
       );
 
       if (!wordObj || wordObj.imageURL) {
-        results.push({ word, status: "skipped", reason: "Image already exists" });
+        results.push({
+          word,
+          status: "skipped",
+          reason: "Image already exists",
+        });
         continue;
       }
 
@@ -207,11 +252,15 @@ export const assignImageToSubjectWord = async (
 
       const imageURL = await getImage(filename);
       if (!imageURL) {
-        results.push({ word, status: "failed", reason: "Failed to retrieve image URL" });
+        results.push({
+          word,
+          status: "failed",
+          reason: "Failed to retrieve image URL",
+        });
         continue;
       }
 
-      const imageAWSURL = await uploadImageToS3(imageURL, filename);
+      const imageAWSURL = await uploadImageToS3(imageURL, `${subject}-${word}`);
 
       const updated = await SubjectWords.findOneAndUpdate(
         {

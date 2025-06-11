@@ -2,6 +2,7 @@ import express from "express";
 import {
   addSubjectWords,
   assignImageToSubjectWord,
+  generateImageForSubject,
   getSubjectWords,
   uploadSubjectWords,
 } from "../services/subjectWord";
@@ -77,7 +78,7 @@ router.post("/upload", upload.single("file"), async (req, res) => {
     }
 
     // Call uploadSubjectWords with subject and list of words
-    const data = await uploadSubjectWords(subject, words);
+    const data = await generateImageForSubject(subject, words);
 
     // Delete the uploaded file after processing
     fs.unlinkSync(file.path);

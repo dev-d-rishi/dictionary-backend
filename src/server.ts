@@ -229,8 +229,3 @@ app.use("/api", uploadExcelRouter);
 app.use("/auth", authRoutes);
 
 app.use("/admin/allWords", allWordsRoutes);
-
-app.use("*", (req, res) => {
-  console.log("❌ Unmatched route:", req.originalUrl);
-  res.status(404).send("Not found");
-});
