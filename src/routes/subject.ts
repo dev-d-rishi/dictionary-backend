@@ -33,19 +33,20 @@ router.get("/:subject", async (req, res) => {
   console.log("🎯 Subject route hit:", req.params.subject);
   try {
     const subject = req.params.subject;
-    const data = await getSubjectWords(subject);
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+
+    const data = await getSubjectWords(subject, page, limit);
 
     if (!data) {
       res.status(404).json({ error: "Subject not found." });
       return;
     }
 
-    res.status(200).json({ success: true, data });
-    return;
+    res.status(200).json({ success: true, ...data });
   } catch (err: any) {
     console.error("❌ Error getting subject words:", err.message);
     res.status(500).json({ error: err.message || "Server error." });
-    return;
   }
 });
 

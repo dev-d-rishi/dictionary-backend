@@ -43,7 +43,11 @@ export const addSubjectWords = async (req: Request, res: Response) => {
 };
 
 // Get subject words with their meaning
-export const getSubjectWords = async (subject: string) => {
+export const getSubjectWords = async (
+  subject: string,
+  page: number,
+  limit: number
+) => {
   if (!subject) {
     throw new Error("Subject is required.");
   }
@@ -56,7 +60,16 @@ export const getSubjectWords = async (subject: string) => {
     throw new Error("Subject not found.");
   }
 
-  return result;
+  const startIndex = (page - 1) * limit;
+  const paginatedWords = result.words.slice(startIndex, startIndex + limit);
+
+  return {
+    subject: result.subject,
+    totalWords: result.words.length,
+    page,
+    totalPages: Math.ceil(result.words.length / limit),
+    words: paginatedWords,
+  };
 };
 
 export const uploadSubjectWords = async (
